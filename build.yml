@@ -1,0 +1,26 @@
+name: Build Windows Exe
+
+on:
+  push:
+    branches: [ main ] # 只要你 push 代码到 main 分支，就触发打包
+
+jobs:
+  build:
+    runs-on: windows-latest # 关键：在云端 Windows 环境下打包
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller pygame
+      - name: Build with PyInstaller
+        # 使用分号 ; 分隔资源，这是 Windows 的规范
+        run: |
+          pyinstaller -D -w --add-data "bgm.mp3;." --add-data "myfont.ttf;." lottery_ball.py
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: lottery-ball-exe
+          path: dist/lottery_ball/
